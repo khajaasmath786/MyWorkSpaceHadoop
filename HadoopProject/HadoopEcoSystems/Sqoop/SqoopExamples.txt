@@ -1,0 +1,22 @@
+----Check Connectivity before importing data-----
+$ mysql --user=training --password=training movielens
+mysql> DESCRIBE movie;
+mysql> SELECT * FROM movie LIMIT 5;
+mysql> SELECT * FROM movierating LIMIT 5;
+mysql> quit
+---------Connect with database name--------------
+$ sqoop list-tables \
+--connect jdbc:mysql://localhost/movielens \
+--username training --password training
+
+Note: Movielens is the database instance name
+--------Import data from Relational Database into Hadoop----
+$ sqoop import \
+--connect jdbc:mysql://localhost/movielens \
+--table movie --fields-terminated-by '\t' \
+--username training --password training
+
+---------- Head and Tail Part of the data----------
+$ hadoop fs -ls movie
+$ hadoop fs -tail movie/part-m-00000
+$ hadoop fs -cat movie/part-m-00000 | head

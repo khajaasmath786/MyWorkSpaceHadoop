@@ -1,0 +1,5 @@
+1. Only part of data
+2. Daily Import at 9:00PM
+3. Import from last import and next lines
+4. Read the data and find out where the java file is generated
+5. Connect to SQL server

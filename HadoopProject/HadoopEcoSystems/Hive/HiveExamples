@@ -1,0 +1,31 @@
+hive>
+****** Note use ; after firing the Hive query ***********
+
+---------------------------------External Table creation----------------------------------------------------------
+hive> CREATE EXTERNAL TABLE movie (id INT, name STRING, year INT) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' LOCATION '/user/training/movie';
+select * from movie limit 10;
+
+hive> CREATE EXTERNAL TABLE movierating
+ (userid INT, movieid INT, rating INT)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+ LOCATION '/user/training/movierating';
+ 
+select * from movierating limit 10;
+
+check if text(movie,movierating) is created in datawarehouse /user/hive/warehouse. It wont be created as table is created as external. We can drop table now
+
+-------------------------------------------------------------------------------------------------------------------
+CREATE  TABLE movierating1
+ (userid INT, movieid INT, rating INT)
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+ LOCATION '/user/training/movierating';
+ 
+ Drop Table will remove raw data
+ 
+ ---------------------------------Local Path table creation------------------------------------------------------
+ 
+CREATE  TABLE movie1 (id INT, name STRING, year INT) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
+Describe movie1;
+load data inpath "/user/training/movierating/part-m-00000" into table movie1;
+
+select * from movie1 limit 10;

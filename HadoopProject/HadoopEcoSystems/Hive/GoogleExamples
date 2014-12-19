@@ -1,0 +1,30 @@
+Usually when you create tables in hive using raw data in HDFS, it moves them to a different location - "/user/hive/warehouse". If you created a simple table, it will be located inside the data warehouse. The following hive command creates a table with data location at "/user/hive/warehouse/user". 
+hive>   CREATE TABLE user(id INT, name STRING) ROW FORMAT
+              DELIMITED FIELDS TERMINATED BY ','
+              LINES TERMINATED BY '\n' STORED AS TEXTFILE;
+
+Consider that the raw data is located at "/home/admin/data1.txt" and if you issues the following hive command, the data would be moved to a new location at "/user/hive/warehouse/user/data1.txt". 
+hive> LOAD DATA INPATH '/home/admin/userdata/data1.txt' INTO TABLE user;
+
+If we want to just do hive queries, it is all fine. When you drop the table, the raw data is lost as the directory corresponding to the table in warehouse is deleted. 
+You may also not want to delete the raw data as some one else might use it in map-reduce programs external to hive analysis. It is far more convenient to retain the data at original location via "EXTERNAL" tables. 
+To create external table, simply point to the location of data while creating the tables. This will ensure that the data is not moved into a location inside the warehouse directory. 
+hive>   CREATE TABLE user(id INT, name STRING) ROW FORMAT
+              DELIMITED FIELDS TERMINATED BY ','
+              LINES TERMINATED BY '\n' 
+              STORED AS TEXTFILE
+              LOCATION '/home/admin/userdata';
+
+Now you could happily use both Hive HQL queries as well as hand-crafted map-reduce programs on the same data. How ever, when you drop the table, hive would attempt to delete the externally located data. This can be addressed by explicitly marking the table "EXTERNAL". Try dropping the table, you will see that the raw data is retained. 
+hive>   CREATE EXTERNAL TABLE user(id INT, name STRING) ROW FORMAT
+              DELIMITED FIELDS TERMINATED BY ','
+              LINES TERMINATED BY '\n' 
+              STORED AS TEXTFILE
+              LOCATION '/home/admin/userdata';
+
+There are few more goodies in Hive that surprised me. You can overlay multiple tables all pointing to the same raw data. The following command below will ensure that there are two table with different schema overlay over the same raw data. This allows you to experiment and create new tables which improves on the previous schema. It also allows you to use different schema for different hive queries. 
+hive>   CREATE EXTERNAL TABLE userline(line STRING) ROW FORMAT
+              DELIMITED FIELDS TERMINATED BY ','
+              LINES TERMINATED BY '\n' 
+              STORED AS TEXTFILE
+              LOCATION '/home/admin/userdata';
